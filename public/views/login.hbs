@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <div class="container">
+        <div class="row">
+            <div class="col" style="width: 100%; margin-left: 80px" >
+                <div class="card">
+                    <div class="card-header">
+                        <h2 style="text-align: center; margin-top: 80px;" class="card-title">LogIn</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="formLogin" action="/login" method="post" enctype="multipart/form-data">
+                            <div class="container-sm">
+                                <div class="mb-3">
+                                    <label for="user" class="form-label">User:</label>
+                                    <input type="text" class="form-control" id="user" name="user" placeholder="User" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary mb-3" style="margin-top: 20px;">Ingresar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+  </body>
+  <script src="../../main.js"></script>
+</html>
