@@ -3,12 +3,12 @@
   <body>
     <div class="container">
         <div class="row">
-            
+            {{#if user}}
             <div style="margin-top: 80px;" class="alert alert-warning d-flex justify-content-between" role="alert">
                 Bienvenido {{ user }}! 
                 <button type="button" class="btn btn-danger" onclick="logout()">Logout</button>
             </div>
-            
+            {{/if}}
 
             <div id="form" class="col" style="width: 100%; margin-left: 80px">
             <h2 style="text-align: center; margin-top: 80px;">Ingrese Producto</h2>

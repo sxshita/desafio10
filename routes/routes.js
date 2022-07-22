@@ -2,6 +2,10 @@ const getLogin = (req, res) => {
     res.render('login');
 };
 
+const getLoginFail = (req, res) => {
+    res.render('login', {error: true});
+};
+
 const postLogin = (req, res) => {
     res.redirect('/')
 };
@@ -9,6 +13,10 @@ const postLogin = (req, res) => {
 const getRegister = (req, res) => {
     res.render('register');
 };
+
+const getRegisterFail = (req, res) => {
+    res.render('register', {error: true});
+}
 
 const postRegister = async (req, res) => {
     res.redirect('/login');
@@ -26,8 +34,10 @@ const getLogout = (req, res) => {
 
 module.exports = {
     getLogin,
+    getLoginFail,
     postLogin,
     getRegister,
+    getRegisterFail,
     postRegister,
     getLogout
 }

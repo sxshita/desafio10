@@ -7,6 +7,9 @@
                 <div class="card" style="width: 25rem;">
                     <div class="card-header">
                         <h2 style="text-align: center;" class="card-title">Vamos a registrarte :)</h2>
+                        {{#if error}}
+                        <p class="badge bg-danger text-wrap text-white">El usuario ya esta en uso, intenta con otro.</p>
+                        {{/if}}
                     </div>
                     <div class="card-body">
                         <form id="formRegister" action="/register" method="post">

@@ -67,11 +67,13 @@ app.get('/', checkAuth ,async (req, res) => {
 
 // ** [LOGIN] ** //
 app.get('/login', routes.getLogin);
-app.post('/login', passport.authenticate('auth'), routes.postLogin);
+app.get('/login/failure', routes.getLoginFail);
+app.post('/login', passport.authenticate('auth', {failureRedirect: '/login/failure'}), routes.postLogin);
 
 // ** [REGISTER] ** //
 app.get('/register', routes.getRegister);
-app.post('/register', passport.authenticate('register', {failureRedirect: '/register', failureMessage: true} ), routes.postRegister);
+app.get('/register/failure', routes.getRegisterFail)
+app.post('/register', passport.authenticate('register', {failureRedirect: '/register/failure', failureMessage: true} ), routes.postRegister);
 
 // ** [LOGOUT] ** //
 app.get('/logout', routes.getLogout)

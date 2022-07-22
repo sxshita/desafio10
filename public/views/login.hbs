@@ -7,6 +7,9 @@
                 <div class="card" style="width: 25rem;">
                     <div class="card-header">
                         <h2 style="text-align: center;" class="card-title">Vamos a conectarte :)</h2>
+                        {{#if error}}
+                        <p class="badge bg-danger text-wrap text-white">Usuario o contraseña incorrectos!</p>
+                        {{/if}}
                     </div>
                     <div class="card-body">
                         <form id="formLogin" action="/login" method="post">
