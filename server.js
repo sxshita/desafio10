@@ -1,36 +1,15 @@
 const { faker } = require('@faker-js/faker');
-const multer = require('multer');
 const express = require('express');
 const { engine } = require("express-handlebars");
 const { Server: HttpServer } = require('http');
 const { Server: SocketServer } = require('socket.io');
-const MongoDbContainer = require('./container');
-const {MongoClient} = require('mongodb');
 const session = require('express-session');
-const cookieParser = require('cookie-parser');
 const MongoStore = require('connect-mongo');
-
-
-const upload = multer();
-
-let products;
-let messages;
-
-async function connectMongo() {
-  try {
-    const mongo = new MongoClient("mongodb+srv://sasha:coder.sasha@cluster0.ezluz.mongodb.net/?retryWrites=true&w=majority");
-    products = new MongoDbContainer(mongo, 'ecommerce', 'products');
-    messages = new MongoDbContainer(mongo, 'chat', 'messages');
-    await mongo.connect();
-  }
-  catch(err) {
-      console.log(`ERROR: ${err}`);
-  }
-}
-connectMongo();
+const connectMongo = require('./mongoInit');
+const passport = require('./passport');
+const routes = require("./routes/routes");
 
 const app = express();
-app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static("public"));
@@ -41,8 +20,11 @@ app.use(session({
   cookie: {
     maxAge: 60000
   },
-  saveUninitialized: true
+  saveUninitialized: true,
+  rolling: true
 }));
+app.use(passport.initialize())
+app.use(passport.session())
 
 app.set('views','./public/views');
 app.set('view engine','hbs');
@@ -68,36 +50,33 @@ async function cargarProductos() {
   return products;
 }
 
-// ** [LOGIN] ** //
-app.get('/login', async (req, res) => {
-  if(req.session.user){
-    res.redirect('/');
+// ** [INDEX] ** //
+function checkAuth(req, res, next){
+  if(req.isAuthenticated()){
+    next();
+  } else {
+    res.redirect("/login")
   }
-  res.render('login');
-});
+}
 
-app.post('/login', upload.none(), async (req, res) => {
-  const username = req.body.user;
-  req.session.user = username;
-  res.redirect('/');
-});
-
-app.get('/logout', (req, res) => {
-  const username = req.session.user;
-  if (req.session.user)
-    req.session.destroy((err) => {
-      if (err) res.send(err);
-      else console.log('Session: destroyed');
-    });
-  res.render('logout', { user: username });
-})
-
-app.get('/', async (req, res) => {
-  if(!req.session.user) res.redirect('/login');
+app.get('/', checkAuth ,async (req, res) => {
+  const {products} = await connectMongo();
   const prods = await products.getAll();
-  res.render('table', { prods, user: req.session.user });
+  res.render('table', { prods, user: req.session.passport.user });
 });
 
+// ** [LOGIN] ** //
+app.get('/login', routes.getLogin);
+app.post('/login', passport.authenticate('auth'), routes.postLogin);
+
+// ** [REGISTER] ** //
+app.get('/register', routes.getRegister);
+app.post('/register', passport.authenticate('register', {failureRedirect: '/register', failureMessage: true} ), routes.postRegister);
+
+// ** [LOGOUT] ** //
+app.get('/logout', routes.getLogout)
+
+// ** [FAKER PRODUCTS] ** //
 app.get('/api/productos-test', async (req, res) => {
   const prods = await cargarProductos();
   res.render('table-test', { prods });
@@ -108,6 +87,7 @@ const httpServer = new HttpServer(app);
 const socketServer = new SocketServer(httpServer);
 
 socketServer.on('connection', async (socket) => {
+  const {products, messages} = await connectMongo();
   const myMessages = await messages.getById(333);
  
   socket.emit('products', await products.getAll());
@@ -138,6 +118,10 @@ socketServer.on('connection', async (socket) => {
   });
 
 });
+
+app.use((error, req, res, next) => {
+  res.status(500).send(error.message);
+})
 
 httpServer.listen(8080, () => {
   console.log('Servidor corriendo en puerto 8080');

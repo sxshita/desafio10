@@ -37,6 +37,17 @@ class MongoDbContainer {
         }
     }
 
+    async findUser(username) {
+        try {
+            const allDocumentsFromCollection = await this.getAll();
+            const document = allDocumentsFromCollection.find(d => d.username === username);
+            return document;
+        }
+        catch {
+
+        }
+    }
+
     async createArrayMessages() {
         try{
             const arrayMessagesFromScratch = {id: 444, messages: []};
